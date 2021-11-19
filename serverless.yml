@@ -1,0 +1,31 @@
+service: guinness-watcher
+
+provider:
+  name: aws
+  region: sa-east-1
+  stage: ${env:STAGE, 'dev'}
+  timeout: 30
+  memorySize: 128
+  runtime: python3.8
+  environment:
+    PYTHONPATH: "src"
+    DISCORD_WEBHOOK: ${env:DISCORD_WEBHOOK}
+
+package:
+  exclude:
+    - .cache/**
+    - node_modules/**
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    pythonBin: python
+    cacheLocation: '.cache/'
+
+functions:
+  guinnessWatcher:
+    handler: src/watcher.guinness_watcher_handler
+    events:
+      - schedule: cron(0 9/3 ? * * *)
